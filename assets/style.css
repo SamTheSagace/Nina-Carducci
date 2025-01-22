@@ -60,6 +60,9 @@ body {
 	left: 0;
 	z-index: -1;
 }
+.picture.right{
+	width: 420px;
+}
 
 .picture {
 	flex: 1;
@@ -69,8 +72,15 @@ body {
 
 .picture img {
 	width: 100%;
-
 }
+.carousel-item{
+	height: 880px;
+}
+.carousel-item.active{
+	height: 880px;
+}
+
+
 #about-me {
 	flex: 2
 }
