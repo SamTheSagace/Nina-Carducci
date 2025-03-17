@@ -112,16 +112,17 @@
         if (element.prop("tagName") === "IMG") {
           element.addClass("img-fluid");
         }
+        let src = element.attr("src");
+        if (src.startsWith("/assets/")) {
+            element.attr("src", src.replace(/^\/assets/, "./assets"));
+        }
       },
       openLightBox(element, lightboxId) {
-        console.log(element)
-        console.log(element.attr("src").split(".").filter((_,index,arr) =>{
-          return index < arr.length-1
-        }))
-        $(`#${lightboxId}`)
-          .find(".lightboxImage").attr("src", element.attr("src").split(".").filter((_,index,arr) =>{
-            return index < arr.length-1
-          }).join("")  + "-large.webp");
+        console.log(element);
+        let originalSrc = element.attr("src");
+        let correctedSrc = originalSrc.replace(/^\/assets/, "./assets");
+        let largeImageSrc = correctedSrc.replace(/\.\w+$/, "-large.webp");
+        $(`#${lightboxId}`).find(".lightboxImage").attr("src", largeImageSrc);
         $(`#${lightboxId}`).modal("toggle");
       },
       prevImage() {
@@ -201,27 +202,20 @@
         $(".lightboxImage").attr("src", $(next).attr("src"));
       },
       createLightBox(gallery, lightboxId, navigation) {
-        gallery.append(`<div class="modal fade" id="${
-          lightboxId ? lightboxId : "galleryLightbox"
-        }" tabindex="-1" role="dialog" aria-hidden="true">
-                  <div class="modal-dialog" role="document">
-                      <div class="modal-content">
-                          <div class="modal-body">
-                              ${
-                                navigation
-                                  ? '<div class="mg-prev" style="cursor:pointer;position:absolute;top:50%;left:-15px;background:white;"><</div>'
-                                  : '<span style="display:none;" />'
-                              }
-                              <img class="lightboxImage img-fluid" alt="Contenu de l'image affichée dans la modale au clique"/>
-                              ${
-                                navigation
-                                  ? '<div class="mg-next" style="cursor:pointer;position:absolute;top:50%;right:-15px;background:white;}">></div>'
-                                  : '<span style="display:none;" />'
-                              }
-                          </div>
+        gallery.append(`
+          <div class="modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" 
+              tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-body">
+                          ${navigation ? '<div class="mg-prev" style="cursor:pointer;position:absolute;top:50%;left:-15px;background:white;"><</div>' : '<span style="display:none;" />'}
+                          <img class="lightboxImage img-fluid" alt="Displayed image in modal"/>
+                          ${navigation ? '<div class="mg-next" style="cursor:pointer;position:absolute;top:50%;right:-15px;background:white;">></div>' : '<span style="display:none;" />'}
                       </div>
                   </div>
-              </div>`);
+              </div>
+          </div>
+      `);
       },
       showItemTags(gallery, position, tags) {
         var tagItems =
