@@ -128,10 +128,7 @@
       prevImage() {
         let activeImageSrc = $(".lightboxImage").attr("src");
         let activeTag = $(".tags-bar span.active-tag").data("images-toggle");
-    
         let imagesCollection = [];
-    
-        // Collect images based on active tag
         if (activeTag === "all") {
             imagesCollection = $(".item-column img.gallery-item").toArray();
         } else {
@@ -154,37 +151,25 @@
     nextImage() {
       let activeImageSrc = $(".lightboxImage").attr("src");
       let activeTag = $(".tags-bar span.active-tag").data("images-toggle");
-  
       let imagesCollection = [];
-  
-      // Collect images based on active tag
       if (activeTag === "all") {
           imagesCollection = $(".item-column img.gallery-item").toArray();
       } else {
           $(".item-column img.gallery-item").each(function() {
               if ($(this).data("gallery-tag") === activeTag) {
-                  imagesCollection.push(this); // Push raw DOM element
+                  imagesCollection.push(this);
               }
           });
       }
-  
-      // Find current image index in the array
       let index = imagesCollection.findIndex(img => {
           let imgSrc = $(img).attr("src").replace(/\.\w+$/, "-large.webp");
           return imgSrc === activeImageSrc;
       });
   
-      // If not found, default to first image
       if (index === -1) index = 0;
-  
-      // Move to next image (loop back if needed)
       let nextIndex = (index < imagesCollection.length - 1) ? index + 1 : 0;
-  
-      // Convert small image src to large version
       let smallSrc = $(imagesCollection[nextIndex]).attr("src");
       let largeSrc = smallSrc.replace(/\.\w+$/, "-large.webp");
-  
-      // Update the lightbox image
       $(".lightboxImage").attr("src", largeSrc);
   }
   ,
