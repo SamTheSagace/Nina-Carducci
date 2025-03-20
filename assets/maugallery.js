@@ -126,81 +126,68 @@
         $(`#${lightboxId}`).modal("toggle");
       },
       prevImage() {
-        let activeImage = null;
-        $("img.gallery-item").each(function() {
-          if ($(this).attr("src") === $(".lightboxImage").attr("src")) {
-            activeImage = $(this);
-          }
-        });
+        let activeImageSrc = $(".lightboxImage").attr("src");
         let activeTag = $(".tags-bar span.active-tag").data("images-toggle");
+    
         let imagesCollection = [];
+    
+        // Collect images based on active tag
         if (activeTag === "all") {
-          $(".item-column").each(function() {
-            if ($(this).children("img").length) {
-              imagesCollection.push($(this).children("img"));
-            }
-          });
+            imagesCollection = $(".item-column img.gallery-item").toArray();
         } else {
-          $(".item-column").each(function() {
-            if (
-              $(this)
-                .children("img")
-                .data("gallery-tag") === activeTag
-            ) {
-              imagesCollection.push($(this).children("img"));
-            }
-          });
+            $(".item-column img.gallery-item").each(function() {
+                if ($(this).data("gallery-tag") === activeTag) {
+                    imagesCollection.push(this); 
+                }
+            });
         }
-        let index = 0,
-          next = null;
+        let index = imagesCollection.findIndex(img => {
+            let imgSrc = $(img).attr("src").replace(/\.\w+$/, "-large.webp");
+            return imgSrc === activeImageSrc;
+        });
+        if (index === -1) index = imagesCollection.length;
+        let prevIndex = (index > 0) ? index - 1 : imagesCollection.length - 1;
+        let smallSrc = $(imagesCollection[prevIndex]).attr("src");
+        let largeSrc = smallSrc.replace(/\.\w+$/, "-large.webp");
+        $(".lightboxImage").attr("src", largeSrc);
+    },
+    nextImage() {
+      let activeImageSrc = $(".lightboxImage").attr("src");
+      let activeTag = $(".tags-bar span.active-tag").data("images-toggle");
   
-        $(imagesCollection).each(function(i) {
-          if ($(activeImage).attr("src") === $(this).attr("src")) {
-            index = i ;
-          }
-        });
-        next =
-          imagesCollection[index] ||
-          imagesCollection[imagesCollection.length - 1];
-        $(".lightboxImage").attr("src", $(next).attr("src"));
-      },
-      nextImage() {
-        let activeImage = null;
-        $("img.gallery-item").each(function() {
-          if ($(this).attr("src") === $(".lightboxImage").attr("src")) {
-            activeImage = $(this);
-          }
-        });
-        let activeTag = $(".tags-bar span.active-tag").data("images-toggle");
-        let imagesCollection = [];
-        if (activeTag === "all") {
-          $(".item-column").each(function() {
-            if ($(this).children("img").length) {
-              imagesCollection.push($(this).children("img"));
-            }
-          });
-        } else {
-          $(".item-column").each(function() {
-            if (
-              $(this)
-                .children("img")
-                .data("gallery-tag") === activeTag
-            ) {
-              imagesCollection.push($(this).children("img"));
-            }
-          });
-        }
-        let index = 0,
-          next = null;
+      let imagesCollection = [];
   
-        $(imagesCollection).each(function(i) {
-          if ($(activeImage).attr("src") === $(this).attr("src")) {
-            index = i;
-          }
-        });
-        next = imagesCollection[index] || imagesCollection[0];
-        $(".lightboxImage").attr("src", $(next).attr("src"));
-      },
+      // Collect images based on active tag
+      if (activeTag === "all") {
+          imagesCollection = $(".item-column img.gallery-item").toArray();
+      } else {
+          $(".item-column img.gallery-item").each(function() {
+              if ($(this).data("gallery-tag") === activeTag) {
+                  imagesCollection.push(this); // Push raw DOM element
+              }
+          });
+      }
+  
+      // Find current image index in the array
+      let index = imagesCollection.findIndex(img => {
+          let imgSrc = $(img).attr("src").replace(/\.\w+$/, "-large.webp");
+          return imgSrc === activeImageSrc;
+      });
+  
+      // If not found, default to first image
+      if (index === -1) index = 0;
+  
+      // Move to next image (loop back if needed)
+      let nextIndex = (index < imagesCollection.length - 1) ? index + 1 : 0;
+  
+      // Convert small image src to large version
+      let smallSrc = $(imagesCollection[nextIndex]).attr("src");
+      let largeSrc = smallSrc.replace(/\.\w+$/, "-large.webp");
+  
+      // Update the lightbox image
+      $(".lightboxImage").attr("src", largeSrc);
+  }
+  ,
       createLightBox(gallery, lightboxId, navigation) {
         gallery.append(`
           <div class="modal fade" id="${lightboxId ? lightboxId : "galleryLightbox"}" 
